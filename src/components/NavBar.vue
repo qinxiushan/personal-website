@@ -1,20 +1,75 @@
-<template lang='pug'>
-header.header
-  a.w-10.h-10.absolute.m-6.select-none.outline-none(href='/' exact focusable='false')
-    img(src='/logo.png' alt='logo')
-  nav.nav
-    .spacer
-    .right
-      a(href='/projects') Projects
-      a(href='/blog') Blog
-      a(href='/')
-        span.iconify.text-lg(data-icon='ri:user-line')
-      a(href='/notes')
-        span.iconify.text-lg(data-icon='ri:chat-1-line')
-      a(href='/bookmarks')
-        span.iconify.text-lg(data-icon='ri:bookmark-line')
+<script setup lang="ts">
+function toTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
 
-      toggle-theme
+const { y: scroll } = useWindowScroll()
+</script>
+
+<template>
+  <header class="header z-40">
+    <RouterLink
+      class="w-12 h-12 absolute xl:fixed m-5 select-none outline-none"
+      to="/"
+      focusable="false"
+    >
+      <Logo />
+    </RouterLink>
+    <button
+      title="Scroll to top"
+      fixed right-3 bottom-3 w-10 h-10 hover:op100 rounded-full
+      hover-bg-hex-8883 transition duration-300 z-100 print:hidden
+      :class="scroll > 300 ? 'op30' : 'op0! pointer-events-none'"
+      @click="toTop()"
+    >
+      <div i-ri-arrow-up-line />
+    </button>
+    <nav class="nav">
+      <div class="spacer" />
+      <div class="right" print:op0>
+        <RouterLink to="/posts" title="Blog">
+          <span class="lt-md:hidden">Blog</span>
+          <div i-ri-article-line md:hidden />
+        </RouterLink>
+        <RouterLink to="/projects" title="Projects">
+          <span class="lt-md:hidden">Projects</span>
+          <div i-ri-lightbulb-line class="md:hidden" />
+        </RouterLink>
+        <RouterLink to="/talks" class="lt-md:hidden" title="Talks">
+          Talks
+        </RouterLink>
+        <RouterLink to="/sponsors-list" title="Sponsors">
+          <span class="lt-md:hidden">Sponsors</span>
+          <div i-ri-heart-line class="md:hidden" />
+        </RouterLink>
+        <RouterLink to="/podcasts" class="lt-md:hidden" title="Podcasts">
+          <div i-ri-mic-line />
+        </RouterLink>
+        <RouterLink to="/photos" title="Photos">
+          <div i-ri-camera-3-line />
+        </RouterLink>
+        <RouterLink to="/demos" title="Demos">
+          <div i-ri-screenshot-line />
+        </RouterLink>
+        <!-- <RouterLink to="/chat" title="Let's Chat">
+          <div i-ri-chat-1-line />
+        </RouterLink> -->
+        <a href="https://bsky.app/profile/antfu.me" target="_blank" title="Bluesky" class="lt-md:hidden">
+          <div i-ri-bluesky-line />
+        </a>
+        <a href="https://github.com/antfu" target="_blank" title="GitHub" class="lt-md:hidden">
+          <div i-uil-github-alt />
+        </a>
+        <a href="/feed.xml" target="_blank" title="RSS" class="lt-md:hidden">
+          <div i-la-rss-square style="font-size:1.25rem; margin: 0 -0.125rem;" />
+        </a>
+        <ToggleTheme />
+      </div>
+    </nav>
+  </header>
 </template>
 
 <style scoped>
@@ -30,7 +85,7 @@ header.header
 
 .nav {
   padding: 2rem;
-  width: 100vw;
+  width: 100%;
   display: grid;
   grid-template-columns: auto max-content;
   box-sizing: border-box;

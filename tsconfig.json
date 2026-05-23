@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": ["DOM", "ESNext"],
     "baseUrl": ".",
     "module": "ESNext",
-    "target": "es2016",
-    "lib": ["DOM", "ESNext"],
+    "moduleResolution": "Bundler",
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "vite/client",
+      "vue-router/auto"
+    ],
     "strict": true,
     "esModuleInterop": true,
-    "incremental": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "plugins": [{ "name": "@vuedx/typescript-plugin-vue" }],
-    "paths": {
-      "/~/*": ["src/*"]
-    }
+    "skipLibCheck": true
   },
   "exclude": ["dist", "node_modules"]
 }
