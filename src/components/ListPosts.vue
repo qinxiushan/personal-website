@@ -40,7 +40,7 @@ function isSameGroup(a: Post, b?: Post) {
 
 function getGroupName(p: Post) {
   if (isFuture(p.date))
-    return 'Upcoming'
+    return '即将发布'
   return getYear(p.date)
 }
 </script>
@@ -49,7 +49,7 @@ function getGroupName(p: Post) {
   <ul>
     <template v-if="!posts.length">
       <div py2 op50>
-        { nothing here yet }
+        { 暂无内容 }
       </div>
     </template>
 
