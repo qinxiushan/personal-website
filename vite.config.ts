@@ -145,7 +145,6 @@ export default defineConfig({
             'ESLint': 'https://github.com/eslint/eslint',
             'Astro': 'https://github.com/withastro/astro',
             'TwoSlash': 'https://github.com/twoslashes/twoslash',
-            'Anthony Fu Collective': { link: 'https://opencollective.com/antfu', imageUrl: 'https://github.com/antfu-collective.png' },
             'Netlify': { link: 'https://netlify.com', imageUrl: 'https://github.com/netlify.png' },
             'Stackblitz': { link: 'https://stackblitz.com', imageUrl: 'https://github.com/stackblitz.png' },
             'Vercel': { link: 'https://vercel.com', imageUrl: 'https://github.com/vercel.png' },
@@ -155,7 +154,6 @@ export default defineConfig({
             ['https://github.com/nuxt/nuxt', 'https://nuxt.com/assets/design-kit/icon-green.svg'],
             ['https://github.com/vitejs/vite', 'https://github.com/vitejs.png'],
             ['https://github.com/sponsors', 'https://github.com/github.png'],
-            ['https://github.com/sponsors/antfu', 'https://github.com/github.png'],
             ['https://nuxtlabs.com', 'https://github.com/nuxtlabs.png'],
             [/opencollective\.com\/vite/, 'https://github.com/vitejs.png'],
             [/opencollective\.com\/elk/, 'https://github.com/elk-zone.png'],
@@ -177,7 +175,7 @@ export default defineConfig({
               ? fs.copy(`${id.slice(0, -3)}.png`, `public/${path}`)
               : generateOg(frontmatter.title!.replace(/\s-\s.*$/, '').trim(), `public/${path}`),
           )
-          frontmatter.image = `https://antfu.me/${path}`
+          frontmatter.image = `https://chengjiabiao.com/${path}`
         })()
         const head = defaults(frontmatter, options)
         return { head, frontmatter }
