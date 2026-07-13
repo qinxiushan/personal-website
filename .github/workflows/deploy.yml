@@ -23,6 +23,5 @@ jobs:
 
       - name: Deploy
         run: |
-          sudo rm -rf /home/ubuntu/project/chengjiabiao/dist
-          sudo cp -r dist /home/ubuntu/project/chengjiabiao/
+          rsync -a --delete dist/ /home/ubuntu/project/chengjiabiao/dist/
           sudo systemctl reload nginx

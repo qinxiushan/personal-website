@@ -12,19 +12,19 @@
 
 ## 2. 目录结构（高频操作区）
 
-| 路径 | 用途 | 备注 |
-|---|---|---|
-| `pages/` | 路由源文件 | `.md` 文件即网页，`index.md` = `/` |
-| `pages/posts/` | 博客文章 | 顶部必须有 frontmatter |
-| `pages/index.md` | 首页 | 修改此处 |
-| `pages/projects.md` | 项目页 | 修改此处 |
-| `src/components/` | Vue 组件 | 头部、底部、Logo 等 |
-| `src/logics/` | 业务逻辑 | localStorage 键名以 `chengjiabiao-` 开头 |
-| `data/` | 静态数据 | talks.ts、media.ts |
-| `public/` | 静态资源 | 直接复制到 `dist/` |
-| `scripts/` | 构建脚本 | 字体、RSS、压缩图片等 |
-| `docs/` | 私人开发笔记 | **已在 .gitignore，不提交** |
-| `.github/workflows/` | CI/CD | deploy.yml 是部署入口 |
+| 路径                   | 用途         | 备注                                      |
+| ---------------------- | ------------ | ----------------------------------------- |
+| `pages/`             | 路由源文件   | `.md` 文件即网页，`index.md` = `/`  |
+| `pages/posts/`       | 博客文章     | 顶部必须有 frontmatter                    |
+| `pages/index.md`     | 首页         | 修改此处                                  |
+| `pages/projects.md`  | 项目页       | 修改此处                                  |
+| `src/components/`    | Vue 组件     | 头部、底部、Logo 等                       |
+| `src/logics/`        | 业务逻辑     | localStorage 键名以`chengjiabiao-` 开头 |
+| `data/`              | 静态数据     | talks.ts、media.ts                        |
+| `public/`            | 静态资源     | 直接复制到`dist/`                       |
+| `scripts/`           | 构建脚本     | 字体、RSS、压缩图片等                     |
+| `docs/`              | 私人开发笔记 | **已在 .gitignore，不提交**         |
+| `.github/workflows/` | CI/CD        | deploy.yml 是部署入口                     |
 
 ## 3. 关键命令
 
@@ -62,9 +62,12 @@ Nginx 80 端口提供静态文件
 ```
 
 **重要约束**：
+
 - workflow 只监听 `push: branches: [main]` 和 `workflow_dispatch`
 - **不监听 `pull_request`**（防外部 PR 触发 runner 执行恶意代码）
 - Runner 是 self-hosted 模式，跑在服务器本地
+- **部署用 `rsync` 而不是 `sudo cp -r`**：前者保持文件所有者为当前用户，后者会把 dist 变成 root 所有，导致后续手动构建 EACCES
+- 如果 dist 已经被 sudo 弄成 root 所有：服务器上执行 `sudo rm -rf /home/ubuntu/project/chengjiabiao/dist` 修复
 
 ## 5. 新增博客文章
 
@@ -89,6 +92,7 @@ art: random  # 可选：首页背景动画类型
 ```
 
 **注意**：
+
 - `art: random` 触发首页动画，其他选项见 `src/components/ArtDots.vue` `ArtPlum.vue`
 - 不要在 frontmatter 写 `image`，会自动从 `pages/posts/<name>.png` 或 OG 模板生成
 
@@ -97,6 +101,7 @@ art: random  # 可选：首页背景动画类型
 组件在 `src/components/` 下，使用 Vue 3 `<script setup lang="ts">` 语法。
 
 修改后：
+
 1. `pnpm run build` 测试
 2. 检查 `dist/` 是否有变化
 3. commit 并 push（自动部署）
@@ -136,15 +141,15 @@ git commit --no-verify -m "fix: xxx"       # 修复
 
 ## 9. 常见踩坑
 
-| 问题 | 原因 | 解决 |
-|---|---|---|
-| `styleText` 报错 | Node.js 版本太低 | 升级到 22+ |
-| 部署 timeout 10 分钟 | 托管 Runner 受限 | 用 self-hosted |
-| 提交非常慢 | pre-commit hook | `git commit --no-verify` |
-| OG 图不显示 | 缺 `image` frontmatter 或同名 png | 让 vite 自动生成或手动加 |
-| 路由 404 | 没在 `pages/` 下 | vite-router 自动从 `pages/` 读 |
-| 中文乱码 | 文件编码不是 UTF-8 | 确保编辑器用 UTF-8 |
-| 刷新页面 404 | 缺 Nginx `try_files` | Nginx 配置加 SPA fallback |
+| 问题                 | 原因                               | 解决                            |
+| -------------------- | ---------------------------------- | ------------------------------- |
+| `styleText` 报错   | Node.js 版本太低                   | 升级到 22+                      |
+| 部署 timeout 10 分钟 | 托管 Runner 受限                   | 用 self-hosted                  |
+| 提交非常慢           | pre-commit hook                    | `git commit --no-verify`      |
+| OG 图不显示          | 缺`image` frontmatter 或同名 png | 让 vite 自动生成或手动加        |
+| 路由 404             | 没在`pages/` 下                  | vite-router 自动从`pages/` 读 |
+| 中文乱码             | 文件编码不是 UTF-8                 | 确保编辑器用 UTF-8              |
+| 刷新页面 404         | 缺 Nginx`try_files`              | Nginx 配置加 SPA fallback       |
 
 ## 10. 调试技巧
 
@@ -166,25 +171,27 @@ sudo tail -f /var/log/nginx/error.log
 
 ## 11. 修改 Logo / 身份信息的位置
 
-| 位置 | 文件 |
-|---|---|
-| Logo SVG | `src/components/Logo.vue`、 `LogoStroke.vue` |
-| Favicon | `public/favicon*.svg` |
-| 页面标题 | `index.html`（`lang="zh-CN"`, `title`） |
-| Footer | `src/components/Footer.vue` |
-| NavBar 链接 | `src/components/NavBar.vue` |
-| RSS/OG 域名 | `scripts/rss.ts`、`vite.config.ts` |
-| 分享 URL base | `src/components/WrapperPost.vue` |
+| 位置            | 文件                                                 |
+| --------------- | ---------------------------------------------------- |
+| Logo SVG        | `src/components/Logo.vue`、 `LogoStroke.vue`     |
+| Favicon         | `public/favicon*.svg`                              |
+| 页面标题        | `index.html`（`lang="zh-CN"`, `title`）        |
+| Footer          | `src/components/Footer.vue`                        |
+| NavBar 链接     | `src/components/NavBar.vue`                        |
+| RSS/OG 域名     | `scripts/rss.ts`、`vite.config.ts`               |
+| 分享 URL base   | `src/components/WrapperPost.vue`                   |
 | localStorage 键 | `src/logics/index.ts`（以 `chengjiabiao-` 开头） |
 
 ## 12. 与上游模板（Anthony Fu）的差异
 
 本项目基于 `antfu.me` 改造，去除了：
+
 - 大量 `pages/*.md`（赞助商、演讲、媒体等页面）
 - `pages/posts/*.md`（原博客文章）
 - `src/components/{photos,qrcode,quansync,shiki,slides}/` 等未用组件
 
 **保留的核心**：
+
 - 工具链（Vite、UnoCSS、markdown-it 插件链）
 - 设计系统（`src/styles/`）
 - 构建脚本（`scripts/`）
