@@ -68,6 +68,7 @@ Nginx 80 端口提供静态文件
 - Runner 是 self-hosted 模式，跑在服务器本地
 - **部署用 `rsync` 而不是 `sudo cp -r`**：前者保持文件所有者为当前用户，后者会把 dist 变成 root 所有，导致后续手动构建 EACCES
 - 如果 dist 已经被 sudo 弄成 root 所有：服务器上执行 `sudo rm -rf /home/ubuntu/project/chengjiabiao/dist` 修复
+- **runner 服务器只放行了 SSH（22）到 github.com，HTTPS（443）被防火墙拦**。需在服务器执行 `git config --global url."git@github.com:".insteadOf "https://github.com/"`，让 actions/checkout 走 SSH 通道
 
 ## 5. 新增博客文章
 
