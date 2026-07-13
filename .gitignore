@@ -15,3 +15,6 @@ drafts
 src/data/sponsors-circles.json
 public/assets/fonts
 .omo
+
+# 内部开发经验文档（不提交到仓库）
+docs/
