@@ -52,10 +52,10 @@ GitHub Actions 触发 (.github/workflows/deploy.yml)
   ↓
 Self-hosted Runner (服务器: ~/actions-runner)
   ↓
-1. actions/checkout@v4 拉取代码
-2. pnpm install --frozen-lockfile
-3. pnpm run build (生成 dist/)
-4. cp dist/ 到 /home/ubuntu/project/chengjiabiao/
+1. cd 到生产目录 /home/ubuntu/project/chengjiabiao
+2. git pull origin main（SSH 通道，绕过 HTTPS 443 封锁）
+3. pnpm install --frozen-lockfile
+4. pnpm run build（直接生成到 ./dist/，Nginx 服务根）
 5. sudo systemctl reload nginx
   ↓
 Nginx 80 端口提供静态文件
@@ -66,9 +66,8 @@ Nginx 80 端口提供静态文件
 - workflow 只监听 `push: branches: [main]` 和 `workflow_dispatch`
 - **不监听 `pull_request`**（防外部 PR 触发 runner 执行恶意代码）
 - Runner 是 self-hosted 模式，跑在服务器本地
-- **部署用 `rsync` 而不是 `sudo cp -r`**：前者保持文件所有者为当前用户，后者会把 dist 变成 root 所有，导致后续手动构建 EACCES
-- 如果 dist 已经被 sudo 弄成 root 所有：服务器上执行 `sudo rm -rf /home/ubuntu/project/chengjiabiao/dist` 修复
-- **runner 服务器只放行了 SSH（22）到 github.com，HTTPS（443）被防火墙拦**。需在服务器执行 `git config --global url."git@github.com:".insteadOf "https://github.com/"`，让 actions/checkout 走 SSH 通道
+- **不用 `actions/checkout@v4`**：服务器到 github.com 的 HTTPS（443）被防火墙拦，checkout 会超时。改用 `cd` 到生产目录 + `git pull`（走 SSH 22）
+- 首次部署需要手动 `git clone` 一次，让生产目录成为 git 仓库
 
 ## 5. 新增博客文章
 

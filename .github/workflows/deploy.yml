@@ -14,14 +14,10 @@ jobs:
   deploy:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Build
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm run build
-
       - name: Deploy
         run: |
-          rsync -a --delete dist/ /home/ubuntu/project/chengjiabiao/dist/
+          cd /home/ubuntu/project/chengjiabiao
+          git pull origin main
+          pnpm install --frozen-lockfile
+          pnpm run build
           sudo systemctl reload nginx
